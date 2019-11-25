@@ -1,2 +1,2 @@
-# [Kattis-Solutions](https://open.kattis.com/?target=_blank)
-My solutions to some Kattis problems
+# Kattis-Solutions
+My solutions to some [Kattis](https://open.kattis.com/) problems
