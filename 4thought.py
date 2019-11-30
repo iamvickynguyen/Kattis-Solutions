@@ -1,4 +1,4 @@
-ops = ['+', '-', '*', '/']
+ops = ['+', '-', '*', '//']
 
 line = int(input())
 for i in range(line):
@@ -12,7 +12,7 @@ for i in range(line):
                 for c in ops:
                     cal = "4 {} 4 {} 4 {} 4".format(a,b,c)
                     if eval(cal) == target:
-                        print(cal + ' = ' + str(target))
+                        print(cal.replace("//", "/") + ' = ' + str(int(target)))
                         boo = False
                         break   
                 else:
@@ -24,4 +24,3 @@ for i in range(line):
         
         if boo:
             print("no solution")
-
