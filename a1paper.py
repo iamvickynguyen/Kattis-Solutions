@@ -1,19 +1,23 @@
 import sys
+import math
+
 smallest_size = int(input())
 papers = [int(x) for x in input().split()]
-h = 2**(-3/4)
-w = 2**(-5/4)
+l = 2**(-3/4)  # longer edge, shorter edge = longer edge / sqrt(2)
 
-# if total < 1, "impossible"
+# alternate edge, and take as many papers as we can
+tape = l
+need = 2
 total = 0
-for i in range (len(papers)):
-    total += papers[i]/(2*(i+1))
+for i in range(1, smallest_size):
+    total += tape*(need/2)
+    need -= papers[i-1]
+    if need <= 0:
+        break
+    need *= 2
+    tape = l/(math.sqrt(2)**i)
 
-    # calculate tape
-
-
-if total < 1:
+if need > 0:
     print("impossible")
-    sys.exit(0)
-
-
+else:
+    print(total)
