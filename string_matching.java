@@ -23,12 +23,8 @@ public class string_matching {
         int N = txt.length();
         int i = 0, j = 0;
         while (i < N) {
-            while (j < M) {
-                if (i >= N)
-                    break;
-                j = dfa[txt.charAt(i)][j];
-                i += 1;
-            }
+            j = dfa[txt.charAt(i)][j];
+            i += 1;
             if (j == M) {
                 System.out.print((i - M) + " "); // found
                 j = 0;
