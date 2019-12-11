@@ -1,5 +1,3 @@
-
-// Idea: Use KMP substring search algo
 import java.util.Scanner;
 
 public class string_matching {
@@ -20,39 +18,31 @@ public class string_matching {
         }
     }
 
-    public int search(String txt) {
+    public void search(String txt) {
         int M = pattern.length();
         int N = txt.length();
-        int i, j;
-        for (i = 0, j = 0; i < N && j < M; i++) {
-            j = dfa[txt.charAt(i)][j];
+        int i = 0, j = 0;
+        while (i < N) {
+            while (j < M) {
+                if (i >= N)
+                    break;
+                j = dfa[txt.charAt(i)][j];
+                i += 1;
+            }
+            if (j == M) {
+                System.out.print((i - M) + " "); // found
+                j = 0;
+            }
         }
-        if (j == M)
-            return i - M; // found
-        return N; // not found
+        System.out.println();
     }
 
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
         while (s.hasNext()) {
-            String pattern = s.nextLine();
-            string_matching k = new string_matching(pattern);
-            String text = s.nextLine();
-            int index = k.search(text);
-            if (index >= text.length()) {
-                System.out.println();
-            } else {
-                int i = 0;
-                while (index < text.length()) {
-                    System.out.print((index + i) + " ");
-                    text = text.substring(index + pattern.length());
-                    i = index + pattern.length();
-                    index = k.search(text);
-                }
-                System.out.println();
-            }
+            string_matching k = new string_matching(s.nextLine());
+            k.search(s.nextLine());
         }
         s.close();
     }
-
 }
