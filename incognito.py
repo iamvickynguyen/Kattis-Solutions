@@ -9,19 +9,7 @@ for _ in range(cases):
         else:
             category[data[1]] += 1
 
-    values = list(category.values())
-
-    total = line
-    for i in range(len(values)):
-        table = [0]
-        for j in range(i+1, len(values)):
-            two_sets = values[i] * values[j]
-            total += two_sets
-            size = len(table)
-            for item in range(1, size):
-                x = values[j] * table[item]
-                total += x
-                table.append(x)
-            table.append(two_sets)
-
-    print(total)
+    total = 1
+    for val in category.values():
+        total *= (val+1)
+    print((total-1))
