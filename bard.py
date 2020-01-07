@@ -1,21 +1,28 @@
 n = int(input())
 e = int(input())
 know = [0]*n
+new_songs = []
 for _ in range(e):
     villager = [int(x) for x in input().split()]
     bard_exists = True if 1 in villager[1:] else False
 
-    # find max songs that a person in that evening know
-    _max = 0
-    for i in range(1, villager[0] + 1):
-        _max = max(know[villager[i]-1], _max)
+    # if bard exists, create new set
+    if bard_exists:
+        new_songs.append(set(villager[1:]))
+    # else, check if in that evening if there is someone know any song from other days
+    # if yes, put all of them in that set
+    else:
+        for item in new_songs:
+            for x in villager[1:]:
+                if x in item:
+                    item |= set(villager[1:])
+                    break
 
-    # update songs
-    for i in range(1, villager[0] + 1):
-        if bard_exists:
-            know[villager[i]-1] += 1
-        else:
-            know[villager[i]-1] = _max
+# count number of songs each villager knows
+for i in range(1, n+1):
+    for s in new_songs:
+        if i in s:
+            know[i-1] += 1
 
 output = [(x+1) for x in range(n) if know[x] == know[0]]
 output.sort()
