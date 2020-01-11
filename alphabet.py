@@ -1,5 +1,5 @@
 # longest increasing subsequence (LIS)
-def LIS():
+def LIS(s):
     table = [1]*len(s)
     for i in range(1, len(s)):
         for j in range(i):
@@ -8,12 +8,4 @@ def LIS():
     return max(table)
 
 
-s = input()
-
-# find first 'a'
-for i in range(len(s)):
-    if s[i] == a:
-        s = s[i:]
-        break
-
-print((len(s)-_max))
+print((26-LIS(input())))
