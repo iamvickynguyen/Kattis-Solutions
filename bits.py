@@ -9,7 +9,6 @@ def count_ones(n):
 line = int(input())
 for _ in range(line):
     b = input()
-    # b = str(format(int(input()), 'b'))
     s = b[0]
     _max = count_ones(str(format(int(s), 'b')))
     for i in range(1, len(b)):
