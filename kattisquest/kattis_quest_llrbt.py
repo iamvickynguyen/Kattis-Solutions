@@ -198,7 +198,7 @@ def find_and_remove(node, x, node_min):
     stack = []
     done = 0
     while True:
-        if x < node_min.key[0]:
+        if x < node_min.key[0] or x <= 0:
             break
         if current is not None:
             stack.append(current)
