@@ -18,24 +18,6 @@ class LLRBTree:
                 return curr
         return None
 
-    def min(self):
-        return self._min(self.root)
-
-    def _min(self, curr):
-        if curr:
-            while curr.left:
-                curr = curr.left
-        return curr
-
-    def max(self):
-        return self._max(self.root)
-
-    def _max(self, curr):
-        if curr:
-            while curr.right:
-                curr = curr.right
-        return curr
-
     def insert(self, key, value = None):
         n = Node(key, value)
         self.root = self._insert(n, self.root)
@@ -46,7 +28,7 @@ class LLRBTree:
 
     def _insert(self, n, curr):
         if curr:
-            if n.key < curr.key:
+            if n.key <= curr.key:
                 curr.left = self._insert(n, curr.left)
             elif curr.key < n.key:
                 curr.right = self._insert(n, curr.right)
@@ -107,50 +89,55 @@ class LLRBTree:
         n.is_red = True
         return x
 
-    def __iter__(self):
-        return iter(self.inorder())
-
-    def inorder(self):
-        Q = deque()
-        self._inorder(self.root, Q)
-        return Q
-
-    def _inorder(self, n, Q):
-        if n:
-            self._inorder(n.left, Q)
-            Q.append(n)
-            self._inorder(n.right, Q)
-
-    def getmid(self, mid):
+    # return mid and number to the right of mid
+    def find_mid(self, mid):
         q = []
-        return self._getmid(self.root, mid, 0, q)[0]
-    
-    def _getmid(self, n, mid, i, q):
-        if i > mid:
-            return q
-        if n:
-            self._getmid(n.left, mid, i+1, q)
-            if i == mid:
-                q.append(n.key)
-            self._getmid(n.right, mid, i+1, q)
-        return q
+        return self._find_mid(self.root, mid, -1, q)
 
-    def getmids(self, mid):
-        q = []
-        q = self._getmids(self.root, mid, 0, q)
-        return ((q[0] + q[1])//2)
-    
-    def _getmids(self, n, mid, i, q):
+    def _find_mid(self, n, mid, i, q):
         if i > mid + 1:
             return q
-        if n:
-            self._getmids(n.left, mid, i+1, q)
+        if n is not None:
+            self._find_mid(n.left, mid, i, q)
+            i += 1
             if i == mid:
                 q.append(n.key)
-            elif i == mid+1:
+            elif i == mid + 1:
                 q.append(n.key)
-            self._getmids(n.right, mid, i+1, q)
-        return q
+                return q
+            else:
+                self._find_mid(n.right, mid, i, q)
+
+
+    # def _find_mid(self, n, mid):
+    #     q = []
+    #     current = n
+    #     i = -1
+    #     stack = []
+
+    #     if not n.left:
+    #         q = [n.key, 0]
+    #         return q
+
+    #     stack.append(current)
+    #     while True:
+    #         if current is not None:
+    #             stack.append(current.left)
+    #             current = current.left
+    #         elif stack:
+    #             current = stack.pop()
+    #             while current is None:
+    #                 current = stack.pop()
+    #             i += 1
+    #             if i == mid:
+    #                 q.append(current.key)
+    #             elif i == mid + 1:
+    #                 q.append(current.key)
+    #                 return q
+    #             stack.append(current.right)
+    #             current = current.right
+    #         else:
+    #             return q
 
 class Node:
 
@@ -176,15 +163,12 @@ for _ in range(cases):
 
     for i in range(n):
         tree.insert(numbers[i])
-        l = tree.__iter__()
-        if len(l) % 2 != 0:
-            total += l[len(l)//2]
+        mid = i // 2
+        q = tree.find_mid(mid)
+
+        if (i+1) % 2 == 0:
+            total += (q[0] + q[1])//2
         else:
-            total += ((l[len(l)//2] + l[len(l)//2-1])//2)
-        # mid = i // 2
-        # if (i+1) % 2 == 0:
-        #     total += tree.getmids(mid)
-        # else:
-        #     total += tree.getmid(mid)
+            total += q[0]
 
     print(total)
