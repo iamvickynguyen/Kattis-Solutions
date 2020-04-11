@@ -1,16 +1,14 @@
 from collections import deque
 import sys
-from copy import deepcopy
 flow = 0
 
-def Edmond_Karp(graph, s, t):
+def Edmond_Karp(graph, residual_graph, s, t):
     global flow
     maxflow = 0
-    residual_graph = [row[:] for row in graph]
-    parent = [-1] * len(graph)
+    parent = [-1] * len(residual_graph)
     while True:
         flow = 0
-        dist = [sys.maxsize] * len(graph)
+        dist = [sys.maxsize] * len(residual_graph)
         dist[s] = 0
         q = deque()
         q.append(s)
@@ -18,17 +16,18 @@ def Edmond_Karp(graph, s, t):
             u = q.popleft()
             if u == t:
                 break # stop BFS if we already reach sink t
-            for v in range(len(graph[u])):
-                if residual_graph[u][v][1] > 0 and dist[v] == sys.maxsize:
-                    dist[v] = dist[u] + 1
-                    q.append(graph[u][v][0])
-                    parent[graph[u][v][0]] = u
+            if u in graph:
+                for v, w in graph[u].items():
+                    if residual_graph[u][v] > 0 and dist[v] == sys.maxsize:
+                        dist[v] = dist[u] + 1
+                        q.append(v)
+                        parent[v] = u
         augment(t, sys.maxsize, s, parent, residual_graph)
         if flow == 0:
             break
         maxflow += flow
-    s, edges = get_edges(graph, residual_graph)
-    return maxflow, s, edges
+    edges = get_edges(graph, residual_graph, t, s)
+    return maxflow, edges
 
 def augment(v, min_edge, s, parent, residual_graph):
     global flow
@@ -40,23 +39,44 @@ def augment(v, min_edge, s, parent, residual_graph):
         residual_graph[parent[v]][v] -= flow
         residual_graph[v][parent[v]] += flow
 
-def get_edges(graph, residual_graph):
-    edges = 0
-    s = ''
-    for i in range(len(graph)):
-        for j in range(len(graph)):
-            if graph[i][j] > residual_graph[i][j]:
-                flow = graph[i][j] - residual_graph[i][j]
-                s += str(i) + ' ' + str(j) + ' ' + str(flow) + '\n'
-                edges += 1
-    return s, edges
+def get_edges(graph, residual_graph, t, s):
+    edges = set()
+    visited = set()
+    q = deque()
+    q.append(s)
+    while q:
+        u = q.popleft()
+        visited.add(u)
+        if u == t:
+            break
+        if u in graph:
+            for k, v in graph[u].items():
+                if v > residual_graph[u][k] and k not in visited:
+                    edges.add((u, k, v - residual_graph[u][k]))
+                    q.append(k)
+    return edges
 
 n,m,s,t = map(int, input().split())
-graph = [[] for i in range(n)]
+graph = {}
+residual_graph = {}
 for _ in range(m):
     u,v,x = map(int, input().split())
-    graph[u].append({v:x})
-    graph[v].append({u:x})
-maxflow, s, edges = Edmond_Karp(graph, s, t)
-print(n, maxflow, edges)
-print(s)
+    if u in graph:
+        graph[u][v] = x
+    else:
+        graph[u] = {v:x}
+
+    if u in residual_graph:
+        residual_graph[u][v] = x
+    else:
+        residual_graph[u] = {v:x}
+
+    if v in residual_graph:
+        residual_graph[v][u] = 0
+    else:
+        residual_graph[v] = {u:0}
+
+maxflow, edges = Edmond_Karp(graph, residual_graph, s, t)
+print(n, maxflow, len(edges))
+for (u,v,w) in edges:
+    print(u,v,w)
