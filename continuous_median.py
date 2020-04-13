@@ -90,23 +90,24 @@ class LLRBTree:
         return x
 
     # return mid and number to the right of mid
-    def find_mid(self, mid):
+    def find_mid(self, mid, is_odd):
         q = []
-        return self._find_mid(self.root, mid, -1, q)
+        return self._find_mid(self.root, mid, q, is_odd)
 
-    def _find_mid(self, n, mid, i, q):
-        if i > mid + 1:
+    def _find_mid(self, n, mid, q, is_odd):
+        if len(q) > mid + 1:
             return q
         if n is not None:
-            self._find_mid(n.left, mid, i, q)
-            i += 1
-            if i == mid:
+            self._find_mid(n.left, mid, q, is_odd)
+            if len(q) == mid:
                 q.append(n.key)
-            elif i == mid + 1:
+                if is_odd:
+                    return q
+            elif len(q) == mid + 1:
                 q.append(n.key)
                 return q
             else:
-                self._find_mid(n.right, mid, i, q)
+                self._find_mid(n.right, mid, q, is_odd)
 
 
     # def _find_mid(self, n, mid):
@@ -164,7 +165,7 @@ for _ in range(cases):
     for i in range(n):
         tree.insert(numbers[i])
         mid = i // 2
-        q = tree.find_mid(mid)
+        q = tree.find_mid(mid, (i+1)%2!=0)
 
         if (i+1) % 2 == 0:
             total += (q[0] + q[1])//2
