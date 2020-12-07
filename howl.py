@@ -1,0 +1,1 @@
+print('AWH' + 'O'*len(input()))
