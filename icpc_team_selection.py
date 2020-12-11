@@ -1,7 +1,7 @@
-set = int(input())
-for _ in range(set):
+t = int(input())
+for _ in range(t):
     n = int(input())
-    score = [int(x) for x in input().split()]
-    score.sort(reverse=True)
-    s = sum(score[:n])
-    print(s)
+    l = [int(i) for i in input().split()]
+    l.sort(reverse = True)
+    total = sum(l[i*2 + 1] for i in range(n))
+    print(total)
