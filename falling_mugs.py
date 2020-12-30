@@ -1,11 +1,12 @@
+# n2^2 - n1^2 = D <=> (n+x)^2 - n^2 = 2xn + x^2 = D
 import math
 d = int(input())
-n1 = -1
-impossible = True
-for i in range(math.floor(math.sqrt(d)) + 1):
-    n2 = math.sqrt(d + i**2)
-    if n2.is_integer():
-        print(str(i) + ' ' + str(int(n2)))
-        impossible = False
-if impossible:
-    print("impossible")
+notfound = True
+for x in range(1, math.ceil(math.sqrt(d)) + 1):
+    n = (d - pow(x, 2))/(2*x)
+    if n.is_integer():
+        print(int(n), int(n+x))
+        notfound = False
+        break
+if notfound:
+    print('impossible')
