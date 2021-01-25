@@ -1,32 +1,31 @@
 #include <iostream>
-#include <string>
 #include <set>
-#include <unordered_map>
+#include <string>
 using namespace std;
 
-bool check_palindrome(string s) {
-	for (int i = 0; i < s.length(); i++) {
-		if (s[i] != s[s.length() - 1 - i])
-			return false;
+void add_palindrome_substrings(string s, int l, int r, set<string> &substrings) {
+	while (l >= 0 && r < s.length() && s[l] == s[r]) {
+		substrings.insert(s.substr(l, r - l + 1));
+		l--;
+		r++;
 	}
-	return true;
 }
 
 int main() {
 	string s;
 	while (cin >> s) {
-		set<string> palindromes;
+		set<string> substrings;
 		for (int i = 0; i < s.length(); i++) {
-			for (int j = 2; i + j <= s.length(); j++) {
-				string subs = s.substr(i, j);
-				if (check_palindrome(subs))
-					palindromes.insert(subs);
-			}
+			if (i + 1 < s.length())
+				add_palindrome_substrings(s, i, i + 1, substrings);
+			if (i + 2 < s.length())
+				add_palindrome_substrings(s, i, i + 2, substrings);
 		}
-		
-		for (auto p : palindromes)
-			cout << p << endl;
+
+		for (string substr : substrings)
+			cout << substr << endl;
 		cout << endl;
 	}
+
 	return 0;
 }
