@@ -1,12 +1,8 @@
 #include <iostream>
-#include <deque>
 #include <utility>
-#include <algorithm>
 #include <vector>
-#include <math.h>
 #include <set>
 using namespace std;
-vector<vector<pair<int, int>>> graph;
 const int INF = 200001;
 
 int main() {
@@ -15,7 +11,7 @@ int main() {
 
     int n, m, a, b, c;
     cin >> n >> m;
-    graph.resize(n);
+    vector<vector<pair<int, int>>> graph(n);
     for (int i = 0; i < m; i++) {
         cin >> a >> b >> c;
         a--; b--;
@@ -24,10 +20,6 @@ int main() {
     }
     
     vector<int> dist(n, INF);
-    vector<char> visited(n, '0');
-    deque<int> q;
-    q.push_back(0);
-    visited[0] = '1';
     dist[0] = 0;
     set<pair<int, int>> pq;
     for (int i = 0; i < n; i++)
