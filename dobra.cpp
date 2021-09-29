@@ -11,89 +11,66 @@
 #include <queue>
 using namespace std;
 typedef long long int ll;
-//const int MAX = 2e5 + 5;
+
 string s;
-vector<int> ways;
+vector<int> ways(101, 1);
 ll ans = 0;
 
-bool check() {
-	int count = 0;
-	bool vowel = true;
-	bool l = false;
-	char c[] = { 'A', 'E', 'I', 'O', 'U' };
-	for (auto i : s) {
-		if (i == 'L') {
-			l = true;
-		}
+bool isvalid() {
+	bool hasL = false, isvowel = true;
+	int cnt = 0;
+	for (char &c: s) {
+		if (c == 'L') hasL = true;
 
-		bool flag = true;
-		for (auto ch : c) {
-			if (i == ch) {
-				flag = false;
-				if (vowel) {
-					count++;
-				} else {
-					count = 1;
-					vowel = true;
-				}
-				break;
+		if (c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U') {
+			if (isvowel) cnt++;
+			else {
+				isvowel = true;
+				cnt = 1;
 			}
+		} else {
+			if (isvowel) {
+				isvowel = false;
+				cnt = 1;
+			} else cnt++;
 		}
 
-		// consonant
-		if (flag) {
-			if (!vowel) {
-				count++;
-			} else {
-				count = 1;
-				vowel = false;
-			}
-		}
-
-		if (count >= 3)
-			return false;
+		if (cnt >= 3) return false;
 	}
 
-	return l;
-}
-
-void update_ans() {
-	ll count = 1;
-	for (auto t : ways)
-		count *= t;
-	ans += count;
+	return hasL;
 }
 
 void solve(int i) {
 	if (i == s.length()) {
-		if (check()) update_ans();
+		if (isvalid()) {
+			ll count = 1;
+			for (int j = 0; j < s.size(); j++) count *= ways[j];
+			ans += count;
+		}
+
 		return;
 	}
 
-	if (s[i] != '_')
-		solve(i + 1);
+	if (s[i] != '_') solve(i + 1);
 	else {
-
 		// try L
 		s[i] = 'L';
 		solve(i + 1);
-		s[i] = '_';
 
 		// try consonant
 		s[i] = 'B';
 		ways[i] = 20;
 		solve(i + 1);
-		s[i] = '_';
-		ways[i] = 1;
 
 		// try vowel
 		s[i] = 'A';
 		ways[i] = 5;
 		solve(i + 1);
+
 		s[i] = '_';
 		ways[i] = 1;
 	}
-	return;
 }
 
 int main() {
@@ -101,7 +78,6 @@ int main() {
 	cin.tie(NULL);
 	
 	cin >> s;
-	ways.resize(s.length(), 1);
 	solve(0);
 	cout << ans;
 	return 0;
