@@ -2,64 +2,53 @@
 #include <vector>
 #include <unordered_set>
 using namespace std;
-const int MAX = 500001;
-int Parent[MAX];
-int Size[MAX];
 
-void make_set() {
-	for (int i = 0; i < MAX; i++) {
-		Parent[i] = i;
-		Size[i] = 1;
+const int MAXSIZE = 500001;
+int parent[MAXSIZE], set_size[MAXSIZE];
+
+void make_sets() {
+	for (int i = 0; i < MAXSIZE; i++) {
+		parent[i] = i;
+		set_size[i] = 1;
 	}
 }
 
-int find(int e) {
-	while (Parent[e] != e) {
-		Parent[e] = Parent[Parent[e]];
-		e = Parent[e];
-	}
-	return e;
+int find(int v) {
+	if (parent[v] != v) parent[v] = find(parent[v]);
+	return parent[v];
 }
 
-void union_set(int e1, int e2) {
-	int root1 = find(e1);
-	int root2 = find(e2);
-	if (root1 != root2) {
-		if (Size[root1] < Size[root2])
-			swap(root1, root2);
-		Parent[root2] = root1;
-		Size[root1] += Size[root2];
-	}
+void union_sets(int a, int b) {
+	int ra = find(a), rb = find(b);
+	if (ra == rb) return;
+	if (set_size[ra] < set_size[rb]) swap(ra, rb);
+	parent[rb] = ra;
+	set_size[ra] += set_size[rb];
 }
 
 int main() {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 
-	make_set();
-
-	int n, m, count = 0;
+	make_sets();
+	int n, m, count = 0, x;
 	cin >> n;
 	while (n--) {
 		cin >> m;
-		unordered_set<int> s;
-		vector<int> ingredients(m);
-		for (auto &i: ingredients){
-			cin >> i;
-			i = find(i);
-			s.insert(i);
+		unordered_set<int> roots;
+		vector<int> ingredients;
+		for (int i = 0; i < m; i++) {
+			cin >> x;
+			ingredients.push_back(x);
+			roots.insert(find(x));
 		}
 
 		int total = 0;
-		for (auto e : s) {
-			total += Size[find(e)];
-		}
+		for (auto &r: roots) total += set_size[find(r)];
 
 		if (total == m) {
 			count++;
-			for (int i = 1; i < ingredients.size(); i++) {
-				union_set(ingredients[0], ingredients[i]);
-			}
+			for (int i = 1; i < ingredients.size(); i++) union_sets(ingredients[0], ingredients[i]);
 		}
 	}
 	cout << count;
