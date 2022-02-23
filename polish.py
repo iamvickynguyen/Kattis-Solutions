@@ -1,4 +1,8 @@
 import sys
+
+def is_number(s):
+    return s.isdigit() or (s.startswith("-") and s[1:].isdigit())
+
 case = 1
 ops = set(['+', '-', '*'])
 for line in sys.stdin:
@@ -6,11 +10,11 @@ for line in sys.stdin:
     stack = []
     s = ''
     for i in range(len(line)):
-        if not line[i].isdigit():
+        if not is_number(line[i]):
             stack.append(line[i])
-        elif line[i].isdigit():
+        elif is_number(line[i]):
             if len(stack) > 1:
-                while len(stack) > 1 and stack[-1].isdigit() and stack[-2] in ops:
+                while len(stack) > 1 and is_number(stack[-1]) and stack[-2] in ops:
                     a = stack.pop()
                     op = stack.pop()
                     cal = a + op + line[i]
