@@ -10,28 +10,23 @@ typedef unordered_map<int, int> ii;
 #define all(x) (x).begin(), (x).end()
 #define pb push_back
 
-bool is_prime(ll n) {
-	if (n == 1) return false;
-	if (n == 2) return true;
-	for (ll i = 2; i < floorl(sqrtl(n)) + 1; i++) {
-		if (n % i == 0) return false;
-	}
-	return true;
-}
-
 int main() {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 
-	ll n;
+	int n, g, x;
 	cin >> n;
-	while (n) {
-		ll i = 2 * n + 1;
-		while (!is_prime(i)) i++;
-		cout << i;
-		if (!is_prime(n)) cout << " (" << n << " is not prime)";
-		cout << '\n';
-		cin >> n;
+	while (n--) {
+		cin >> g;
+		int prev, found = -1;
+		cin >> prev;
+		for (int i = 1; i < g; i++) {
+			cin >> x;
+			if (found == -1 && x != (prev + 1)) found = i;
+			prev = x;
+		}
+
+		cout << found + 1 << '\n';
 	}
 
 	return 0;
