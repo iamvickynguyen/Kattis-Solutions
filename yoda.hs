@@ -12,11 +12,11 @@ main = do
  let a = pad first second padding ++ first
  let b = pad second first padding ++ second
  let pairs = [(x, y) | (x, y) <- zip a b]
- let result = foldl (\ (x, y) ans -> if (x > y)
-                                      then (x : (fst ans), snd ans)
+ let result = foldl (\ (res1, res2) (x, y) -> if (x > y)
+                                      then (res1 ++ [x], res2)
                                      else if x == y
-                                      then (x : (fst ans), x : (snd ans))
-                                     else (fst ans, y : (snd ans))
+                                      then (res1 ++ [x], res2++ [y])
+                                     else (res1, res2 ++ [y])
                     ) ("", "") pairs
  let (res1, res2) = result
  if res1 == ""
