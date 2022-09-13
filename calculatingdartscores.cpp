@@ -4,7 +4,6 @@
 #include <vector>
 using namespace std;
 
-
 bool solve(int count, int sum, vector<pair<int, int>>& points, const int target) {
 	if (count >= 3)
 		return sum == target;
@@ -12,10 +11,10 @@ bool solve(int count, int sum, vector<pair<int, int>>& points, const int target)
 	if (sum > target)
 		return false;
 
-	for (int i = 3; i >= 1; --i) {
-		for (int j = 20; j >= 1; --j) {
+	for (int i = 0; i <= 3; ++i) {
+		for (int j = 1; j <= 20; ++j) {
 			if ((sum + i * j) > target)
-				continue;
+				break;
 
 			pair<int, int> tmp = points[count];
 			points[count] = make_pair(j, i);
@@ -35,8 +34,10 @@ int main() {
 	vector<pair<int, int>> points(3, {1, 1});
 	if (solve(0, 0, points, n)) {
 		string words[] = {"single", "double", "triple"};
-		for (auto& [point, mult]: points)
-			cout << words[mult - 1] << " " << point << '\n';
+		for (auto& [point, mult]: points) {
+			if (mult != 0)
+				cout << words[mult - 1] << " " << point << '\n';
+		}
 	} else
 		cout << "impossible";
 	return 0;
