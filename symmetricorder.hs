@@ -8,7 +8,6 @@ trim = f . f
 cmp :: String -> String -> Ordering
 cmp a b
  | length a > length b = GT
- | length a == length b && a > b = GT
  | otherwise = LT
 
 parseProblem :: [String] -> [[String]]
