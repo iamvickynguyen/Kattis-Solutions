@@ -56,6 +56,5 @@ int main() {
 		cout << (s.length() / pattern_length) << '\n';
 		cin >> s;
 	}
-  
-  return 0;
 }
+
