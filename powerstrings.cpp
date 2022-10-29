@@ -1,60 +1,58 @@
 #include <iostream>
-#include <string>
-#include <math.h>
 #include <vector>
+#include <string>
+#include <algorithm>
 using namespace std;
 
-vector<int> factors;
-string s;
+/*
+ * The idea is to duplicate the string, then match the original string with the duplicated one
+ * The index when the string is matched for the second time (the first match happens at the beginning of the duplicated string)
+ * is the length of the desired pattern
+ * Divide the original string length by that index is the answer
+ */
 
-vector<int> get_factors(const int n) {
-	vector<int> facts;
-	int factor = floor((n + 0.0)/2);
-	while (factor != 0) {
-		if (n % factor == 0)
-			facts.push_back(factor);
-		--factor;
-	}
-	return facts;
-}
-
-int get_smallest_pattern_length(const int s_len, const int p) {
-	if (s_len == 1) return s_len;
+vector<int> kmp_table(const string &s) {
+	vector<int> table(s.length());
+	table[0] = 0;
 	
-	for (int f = p; f >= 0; --f) {
-		if (s_len % factors[f] == 0) {
-			const int factor = factors[f];
-	
-			// check if the pattern has the length = factor
-			bool ok = true;
-			for (int i = 0; i < s_len; i += factor) {
-				for (int j = 0; j < factor; ++j) {
-					if (s[j] != s[i + j]) {
-						ok = false;
-						break;
-					}
-				}
-
-				if (!ok) break;
-			}
-
-			// if the pattern has the length = factor, call the function on the smaller string
-			if (ok) {
-				return get_smallest_pattern_length(factor, f - 1);
+	int i = 0, j = 1;
+	while (j < s.length()) {
+		if (s[i] == s[j]) {
+			table[j] = i + 1;
+			++i;
+			++j;
+		} else {
+			if (i > 0) i = table[i - 1];
+			else {
+				table[j] = 0;
+				++j;
 			}
 		}
 	}
 
-	return s_len;
+	return table;
+}
+
+int kmp(const string &s) {
+	vector<int> table = kmp_table(s);
+	
+	int j = 0;
+	for (int i = 1; i < s.length() * 2; ++i) {
+		while (j > 0 && s[i % s.length()] != s[j]) j = table[j - 1];
+		if (s[i % s.length()] == s[j]) ++j;
+		if (j == s.length()) return (i - s.length() + 1);
+	}
+
+	return s.length();
 }
 
 int main() {
+	string s;
 	cin >> s;
 	while (s != ".") {
-		factors = get_factors(s.length());
-		int pattern_length = get_smallest_pattern_length(s.length(), factors.size() - 1);
-		cout << (s.length() / pattern_length) << '\n';
+		cout << (s.length() / kmp(s)) << '\n';
 		cin >> s;
 	}
-}
 
+	return 0;
+}
