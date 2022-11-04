@@ -14,8 +14,8 @@ struct flight {
 
 vector<vector<flight>> airports;
 
-ll explore(const int country, const int n, const ll frustration, const ll start, const ll end) {
-	if (country == n) return frustration;
+ll explore(const int country, const int n, const ll end) {
+	if (country == n) return 0;
 
 	ll min_frustration = MAXVAL;
 	for (auto &flight: airports[country]) {
@@ -24,11 +24,12 @@ ll explore(const int country, const int n, const ll frustration, const ll start,
 				[](const pair<int, int> &lhs, const pair<int, int> &rhs) -> bool {return lhs.first < rhs.first;}) - flight.schedule.begin();
 		for (int i = p; i < flight.schedule.size(); ++i) {
 			ll time = flight.schedule[i].first - end;
-			min_frustration = min(min_frustration, explore(flight.country, n, frustration + time * time, flight.schedule[i].first, flight.schedule[i].second));
+			ll frust = time * time + explore(flight.country, n, flight.schedule[i].second);
+			min_frustration = min(min_frustration, frust);
 		}
 	}
 
-	return frustration + min_frustration;
+	return min_frustration;
 }
 
 
@@ -57,7 +58,7 @@ int main() {
 	ll ans = MAXVAL;
 	for (auto &flight: airports[0]) {
 		for (auto &time: flight.schedule) {
-			ll frustration = explore(0, n - 1, time.first * time.first, time.first, time.second);
+			ll frustration = time.first * time.first + explore(0, n - 1, time.second);
 			ans = min(ans, frustration);
 		}
 	}
