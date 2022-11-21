@@ -1,68 +1,91 @@
 #include <iostream>
-#include <vector>
+#include <queue>
+#include <unordered_map>
 #include <utility>
-#include <algorithm>
+#include <vector>
 using namespace std;
 using ll = long long int;
 
-constexpr ll MAXVAL = 2e17;
+constexpr ll INF = 1e12;
 
-struct flight {
-	int country;
-	vector<pair<int, int>> schedule;
+struct Node {
+	int next_airport;
+	ll arrival_time;
+	ll frustration;
+	Node(int next_airport, ll arrival_time, ll frustration): next_airport(next_airport), arrival_time(arrival_time), frustration(frustration) {}
 };
 
-vector<vector<flight>> airports;
+struct cmpNode {
+	bool operator() (const Node &a, const Node &b) {
+		return a.frustration > b.frustration;
+	}
+};
 
-ll explore(const int country, const int n, const ll end) {
-	if (country == n) return 0;
+struct Flight {
+	ll depart;
+	ll arrive;
+	int id;
+	Flight(ll depart, ll arrive, int id): depart(depart), arrive(arrive), id(id) {}
+};
 
-	ll min_frustration = MAXVAL;
-	for (auto &flight: airports[country]) {
-		pair<int, int> tmp = {end, end};
-		int p = lower_bound(flight.schedule.begin(), flight.schedule.end(), tmp,
-				[](const pair<int, int> &lhs, const pair<int, int> &rhs) -> bool {return lhs.first < rhs.first;}) - flight.schedule.begin();
-		for (int i = p; i < flight.schedule.size(); ++i) {
-			ll time = flight.schedule[i].first - end;
-			ll frust = time * time + explore(flight.country, n, flight.schedule[i].second);
-			min_frustration = min(min_frustration, frust);
+ll dijkstra(vector<unordered_map<int, vector<pair<Flight>> &graph, const int N, const int M) {
+	vector<ll> cost(M + 2, INF);
+	cost[N - 2] = 0LL; // source node
+	
+	// push starting nodes
+	priority_queue<Node, vector<Node>, cmpNode> pq;
+	for (auto &[to_airport, flights]: graph[0]) {
+		for (auto &f: flights) {
+			ll waiting = f.depart * f.depart;
+			pq.push(Node(to_airport, f.arrive, waiting));
+			cost[f.id] = waiting;
 		}
 	}
 
-	return min_frustration;
+	while (!pq.empty()) {
+		Node node = pq.top();
+		pq.pop();
+
+		int next = node.next_airport;
+		ll arrive = node.arrival_time;
+		ll frust = node.frustration;
+		
+		// FIXME
+		for (auto &[flight, frustration]: graph[node.id]) {
+			ll new_cost = node.weight + frustration;
+			if (new_cost < cost[flight]) {
+				cost[flight] = new_cost;
+				pq.push(Node(flight, new_cost));
+			}
+		}
+	}
+
+	return cost[N - 1];
 }
 
-
 int main() {
-	int n, m, a, b, s, e;
-	cin >> n >> m;
-	
-	airports.resize(n);
-	for (int i = 0; i < m; ++i) {
-		cin >> a >> b >> s >> e;
-		--a; --b;
-		struct flight fl;
-		fl.country = b;
-		fl.schedule.push_back({s, e});
-		airports[a].push_back(move(fl));
-	}
+  int n, m, a, b;
+	ll s, e;
+  cin >> n >> m;
 
-	// sort
-	for (auto &flights: airports) {
-		for (auto &flight: flights) {
-			sort(flight.schedule.begin(), flight.schedule.end());
+  // collect flight information
+  vector<unordered_map<int, vector<Flight>> graph(n); // index is source country, stores map of {destination country: list of Flights} 
+
+  for (int i = 0; i < m; ++i) {
+    cin >> a >> b >> s >> e;
+    --a;
+    --b;
+    graph[a][b].push_back(Flight(s, e, i));
+  }
+
+	// sort flight schedules so that we can use binary search to find the next possible flight
+	for (int i = 0; i < n; ++i) {
+		for (auto &[airport, schedules]: graph[i]) {
+			sort(schedules.begin(), schedules.end(),
+					[](const Flight &a, const Flight &b) { return a.depart < b.depart; });
 		}
 	}
 
-	// explore
-	ll ans = MAXVAL;
-	for (auto &flight: airports[0]) {
-		for (auto &time: flight.schedule) {
-			ll frustration = time.first * time.first + explore(0, n - 1, time.second);
-			ans = min(ans, frustration);
-		}
-	}
-
-	cout << ans;
-	return 0;
+	cout << dijkstra(graph, n, m);
+  return 0;
 }
