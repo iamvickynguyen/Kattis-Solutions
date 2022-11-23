@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <algorithm>
 using namespace std;
 using ll = long long int;
 
@@ -28,9 +29,9 @@ struct Flight {
 	Flight(ll depart, ll arrive, int id): depart(depart), arrive(arrive), id(id) {}
 };
 
-ll dijkstra(vector<unordered_map<int, vector<pair<Flight>> &graph, const int N, const int M) {
+ll dijkstra(vector<unordered_map<int, vector<Flight>>> &graph, const int N, const int M) {
 	vector<ll> cost(M + 2, INF);
-	cost[N - 2] = 0LL; // source node
+	cost[M] = 0LL; // source node
 	
 	// push starting nodes
 	priority_queue<Node, vector<Node>, cmpNode> pq;
@@ -39,6 +40,8 @@ ll dijkstra(vector<unordered_map<int, vector<pair<Flight>> &graph, const int N, 
 			ll waiting = f.depart * f.depart;
 			pq.push(Node(to_airport, f.arrive, waiting));
 			cost[f.id] = waiting;
+			
+			cout << "push: " << to_airport << ", id: " << f.id << '\n';
 		}
 	}
 
@@ -49,18 +52,29 @@ ll dijkstra(vector<unordered_map<int, vector<pair<Flight>> &graph, const int N, 
 		int next = node.next_airport;
 		ll arrive = node.arrival_time;
 		ll frust = node.frustration;
-		
-		// FIXME
-		for (auto &[flight, frustration]: graph[node.id]) {
-			ll new_cost = node.weight + frustration;
-			if (new_cost < cost[flight]) {
-				cost[flight] = new_cost;
-				pq.push(Node(flight, new_cost));
+	
+		for (auto &[airport, flights]: graph[next]) {
+			for (auto &flight: flights) {
+				if (flight.depart >= arrive) {
+					ll wait = flight.depart - arrive;
+					ll new_cost = frust + wait * wait;
+					if (new_cost < cost[flight.id]) {
+						cost[flight.id] = new_cost;
+						pq.push(Node(airport, flight.arrive, new_cost));
+			
+						cout << "push: " << airport << ", id: " << flight.id << '\n';
+						
+						// if destination
+						if (airport == (N - 1)) {
+							cost[M + 1] = min(cost[M], new_cost);
+						}
+					}
+				}
 			}
 		}
 	}
 
-	return cost[N - 1];
+	return cost[M + 1];
 }
 
 int main() {
@@ -69,7 +83,7 @@ int main() {
   cin >> n >> m;
 
   // collect flight information
-  vector<unordered_map<int, vector<Flight>> graph(n); // index is source country, stores map of {destination country: list of Flights} 
+  vector<unordered_map<int, vector<Flight>>> graph(n); // index is source country, stores map of {destination country: list of Flights} 
 
   for (int i = 0; i < m; ++i) {
     cin >> a >> b >> s >> e;

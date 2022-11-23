@@ -7,7 +7,7 @@
 using namespace std;
 using ll = long long int;
 
-constexpr int P = 73;
+constexpr int P = 31;
 constexpr ll M1 = 253707997;
 constexpr ll M2 = 111111571;
 
@@ -18,63 +18,45 @@ vector<ll> power2;
 ll compute_string_hash(const string &s, const ll M, vector<ll> &power) {
 	ll result = 0LL;
 	for (int i = 0; i < s.length(); ++i) {
-//		result = (result + 1LL * (s[i] - 'a' + 1) * power[i] % M) % M;
-		result += (power[i] * (s[i] - 'a' + 1)) % M;
+		result += ((power[i] * (s[i] - 'a' + 1)) % M);
 		result %= M;
-
-//		result *= P;
-//		result %= M;
-//		result += (s[i] - 'a' + 1);
-//		result %= M;
 	}
 	return result;
 }
 
 // rolling hash with the head part and the tail part
 // ignore the removed character, then combine
-bool is_typo(const string &s) {
+vector<ll> rolling_hash(const string &s, const ll M, const vector<ll> &power) {
+	vector<ll> hashes;
+	hashes.reserve(s.length());
+
 	ll head = 0LL, tail = 0LL;
-	ll head2 = 0LL, tail2 = 0LL;
 	
 	// compute tail hash
 	for (int i = 1; i < s.length(); ++i) {
-//		tail = (tail + 1LL * (s[i] - 'a' + 1) * power[i - 1] % M) % M;
-		tail += (power1[i - 1] * (s[i] - 'a' + 1)) % M1;
-		tail %= M1;
-		
-		tail2 += (power2[i - 1] * (s[i] - 'a' + 1)) % M2;
-		tail2 %= M2;
+		tail += ((power[i - 1] * (s[i] - 'a' + 1)) % M);
+		tail %= M;
 	}
 
-	ll h1 = (head + tail) % M1;
-	ll h2 = (head2 + tail2) % M2;
-	if (hashes.find({h1, h2}) != hashes.end())
-		return true;
+	ll h = (head + tail) % M;
+	cout << h << '\n';
+	hashes.push_back(h);
 
 	// rolling hash with removing a character
 	for (int i = 0; i < (s.length() - 1); ++i) {
-//		head = (head + 1LL * (s[i] - 'a' + 1) * power[i] % M) % M;
-//		tail -= 1LL * (s[i + 1] - 'a' + 1) * power[i];
+		head += ((power[i] * (s[i] - 'a' + 1)) % M);
+		head %= M;
+		tail -= ((power[i] * (s[i + 1] - 'a' + 1)) % M);
+		tail %= M;
 
-		head += (power1[i] * (s[i] - 'a' + 1)) % M1;
-		head %= M1;
-		tail -= (power1[i] * (s[i + 1] - 'a' + 1)) % M1;
-		tail %= M1;
-
-		head2 += (power2[i] * (s[i] - 'a' + 1)) % M2;
-		head2 %= M2;
-		tail2 -= (power2[i] * (s[i + 1] - 'a' + 1)) % M2;
-		tail2 %= M2;
-		
-		h1 = (head + tail) % M1;
-		h2 = (head2 + tail2) % M2;
-
-		if (hashes.find({h1, h2}) != hashes.end())
-			return true;
+		h = (head + tail) % M;
+		cout << h << '\n';
+		hashes.push_back(h);
 	}
-
-	return false;
+	
+	return hashes;
 }
+
 
 void compute_power(vector<ll> &power, const int maxlength, const ll M) {
 	power.reserve(maxlength);
@@ -110,10 +92,14 @@ int main() {
 
 	bool flag = false;
 	for (auto w: words) {
-//		cout << "CHECKING: " << w << '\n';
-		if (is_typo(w)) {
-			flag = true;
-			cout << w << '\n';	
+		vector<ll> hashes1 = rolling_hash(w, M1, power1);
+		vector<ll> hashes2 = rolling_hash(w, M2, power2);
+		for (int i = 0; i < hashes1.size(); ++i) {
+			if (hashes.find({hashes1[i], hashes2[i]}) != hashes.end()) {
+				flag = true;
+//				cout << w << '\n';
+				break;
+			}
 		}
 	}
 
