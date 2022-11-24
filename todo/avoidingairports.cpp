@@ -40,8 +40,6 @@ ll dijkstra(vector<unordered_map<int, vector<Flight>>> &graph, const int N, cons
 			ll waiting = f.depart * f.depart;
 			pq.push(Node(to_airport, f.arrive, waiting));
 			cost[f.id] = waiting;
-			
-			cout << "push: " << to_airport << ", id: " << f.id << '\n';
 		}
 	}
 
@@ -62,11 +60,9 @@ ll dijkstra(vector<unordered_map<int, vector<Flight>>> &graph, const int N, cons
 						cost[flight.id] = new_cost;
 						pq.push(Node(airport, flight.arrive, new_cost));
 			
-						cout << "push: " << airport << ", id: " << flight.id << '\n';
-						
 						// if destination
 						if (airport == (N - 1)) {
-							cost[M + 1] = min(cost[M], new_cost);
+							cost[M + 1] = min(cost[M + 1], new_cost);
 						}
 					}
 				}
