@@ -52,7 +52,10 @@ ll dijkstra(vector<unordered_map<int, vector<Flight>>> &graph, const int N, cons
 		ll frust = node.frustration;
 	
 		for (auto &[airport, flights]: graph[next]) {
-			for (auto &flight: flights) {
+			auto iter = lower_bound(flights.begin(), flights.end(), Flight(arrive, arrive, 0),
+					[](const Flight &a, const Flight &b) { return a.depart < b.depart; });
+			for (auto it = iter; it != flights.end(); ++it) {
+				auto flight = *it;
 				if (flight.depart >= arrive) {
 					ll wait = flight.depart - arrive;
 					ll new_cost = frust + wait * wait;
